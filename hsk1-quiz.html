@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Educ</title>        
+    <title>HSK1-Quiz</title>
+    <link rel="stylesheet" href="hsk1.css">
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.6.0/css/fontawesome.min.css"> -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    
+
     <section class="sub-header">
         <nav>
             <a href="index.html"><img src="images/logo.png" alt=""></a>
@@ -30,54 +29,21 @@
             </div>
             <i class="fa fa-bars" onclick="showMenu()"></i>
         </nav>
-        <h1>Холбогдох хаяг</h1>
+        <h1>Хятад хэлний HSK-1 шалгалтны 150 үгийн мэдлэгийн тест</h1>
     </section>
 
-    <section class="location">
-
-        <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d3978.574962743774!2d106.92298840608018!3d47.89188881436521!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x5d9693efa8229161%3A0x24dc71ba4c8f435c!2sNCD%20Group!5e1!3m2!1sen!2smn!4v1749447775501!5m2!1sen!2smn" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-
-    </section>    
-
-    <section class="contact-us">
-
-        <div class="row">
-            <div class="contact-col">
-                <div>
-                    <i class="fa fa-home"></i>
-                    <span>
-                        <h5>Хурдны Зам, 17025 Highest Tower Building</h5>
-                        <p>Улаанбаатар хот, Монгол улс</p>
-                    </span>
-                </div>
-
-                <div>
-                    <i class="fa fa-phone"></i>
-                    <span>
-                        <h5>+976 99215231</h5>
-                        <p>Даваа - Баасан, 9AM to 6PM</p>
-                    </span>
-                </div>
-
-                <div>
-                    <i class="fa fa-envelope-o"></i>
-                    <span>
-                        <h5>info@highest.com</h5>
-                        <p>Асуулт, хүсэлтээ имейлээр илгээнэ үү</p>
-                    </span>
-                </div>
+    <div class="app">
+        <div class="quiz">
+            <h2 id="question">Асуулт</h2>
+            <div id="answer-buttons">
+                <button class="btn">Answer 1</button>
+                <button class="btn">Answer 2</button>
+                <button class="btn">Answer 3</button>
+                <button class="btn">Answer 4</button>
             </div>
-            <div class="contact-col">
-                <form action="">
-                    <input type="text" placeholder="Нэрээ энд оруулна уу" required>
-                    <input type="email" placeholder="Имейл хаягаа энд оруулна" required>
-                    <input type="text" placeholder="Гарчигаа оруулна уу" required>
-                    <textarea rows="8" placeholder="Мэдээ мэдээлэл санал хүсэлт" required></textarea>
-                    <button type="submit" class="hero-btn red-btn">Илгээх</button>
-                </form>
-            </div>
+            <button id="next-btn">Дараагийн асуулт</button>
         </div>
-    </section>
+    </div>
 
     <section class="footer">
         <h4>Бидний тухай</h4>
@@ -91,6 +57,8 @@
             <p>Ё. Баярсайхан Software ХХК™, Улаанбаатар хот, Монгол улсад <i class="fa fa-heart-o"></i> бүтээв®, ©2025</p>
     </section>
 
+
+    <script src="hsk1.js"></script>
     <script>
 
         var navLinks = document.getElementById("navLinks");
