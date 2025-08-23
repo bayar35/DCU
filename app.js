@@ -15,7 +15,7 @@ let bee;
 let mixer;
 const loader = new GLTFLoader();
 loader.load(
-  "ferrari.glb",
+  "bee.glb",
   function (gltf) {
     bee = gltf.scene;
     scene.add(bee);
