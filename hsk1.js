@@ -479,9 +479,9 @@ const questions = [
     {
         question: "Аль нь 'дотор, -д, -т' вэ?",
         answers: [
-            { text: "里", correct: false},
+            { text: "车", correct: false},
             { text: "好", correct: false},
-            { text: "好", correct: false},
+            { text: "明", correct: false},
             { text: "里", correct: true},
         ]
     },

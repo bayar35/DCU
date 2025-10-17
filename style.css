@@ -488,3 +488,11 @@ h3 {
     border: 1px solid #ccc;
     box-sizing: border-box;
 }
+
+#container3D {
+    position: fixed;
+    inset: 0;
+    /* background-color: red; */
+    z-index: 100;
+    pointer-events: none;
+}

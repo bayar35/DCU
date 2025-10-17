@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Educ</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="hsk1.css" />
+    <link rel="stylesheet" href="hsk1.js" />
+  </head>
+  <body>
+    <div class="header">
+      <nav>
+        <a href="/../index.html"><img src="/../images/logo.png" alt="" /></a>
+        <div class="nav-links" id="navLinks">
+          <i class="fa fa-times" onclick="hideMenu()"></i>
+          <ul>
+            <li><a href="/../index.html">Нүүр</a></li>
+            <li><a href="/../about.html">Бидний тухай</a></li>
+            <li><a href="/../course.html">Сургалт</a></li>
+            <li><a href="/../blog.html">Блог</a></li>
+            <li><a href="dcu-chess.html">Шатар</a></li>
+            <li><a href="/../hsk1-quiz.html">HSK-1 тэст</a></li>
+            <li><a href="/../contact.html">Холбоо</a></li>
+          </ul>
+        </div>
+        <i class="fa fa-bars" onclick="showMenu()"></i>
+      </nav>
+
+      <div class="text">
+        <h2>Шатрын бодлого</h2>
+  
+        <div class="chessBoard">
+          <! -- 8th Rank -->
+          <div class="square white">
+            <div class="rook piece" id="black-rook-a8" color="color">
+              <img src="Black-Rook.png" alt="Rook" />
+            </div>
+          </div>
+          <div class="square black">
+            <div class="piece knight" id="black-knight-b8" color="color">
+              <img src="Black-Knight.png" alt="Knight" />
+            </div>
+          </div>
+          <div class="square white">
+            <div class="piece bishop" id="black-bishop-c8" color="color">
+              <img src="Black-Bishop.png" alt="Bishop" />
+            </div>
+          </div>
+          <div class="square black">
+            <div class="piece queen" color="color">
+              <img src="Black-Queen.png" alt="Queen" />
+            </div>
+          </div>
+          <div class="square white">
+            <div class="piece king" color="color">
+              <img src="Black-King.png" alt="King" />
+            </div>
+          </div>
+          <div class="square black">
+            <div class="piece bishop" color="color">
+              <img src="Black-Bishop.png" alt="Bishop" />
+            </div>
+          </div>
+          <div class="square white">
+            <div class="piece knight" color="color">
+              <img src="Black-Knight.png" alt="Knight" />
+            </div>
+          </div>
+          <div class="square black">
+            <div class="coordinate rank whiteText">8</div>
+            <div class="rook piece" color="color">
+              <img src="Black-Rook.png" alt="Rook" />
+            </div>
+          </div>
+          <! -- 7th Rank -->
+          <div class="square black">
+            <div class="pawn piece" id="black-pawn-a7" color="color">
+              <img src="Black-Pawn.png" alt="Pawn" />
+            </div>
+          </div>
+          <div class="square white">
+            <div class="pawn piece" color="color">
+              <img src="Black-Pawn.png" alt="Pawn" />
+            </div>
+          </div>
+          <div class="square black">
+            <div class="pawn piece" color="color">
+              <img src="Black-Pawn.png" alt="Pawn" />
+            </div>
+          </div>
+          <div class="square white">
+            <div class="pawn piece" color="color">
+              <img src="Black-Pawn.png" alt="Pawn" />
+            </div>
+          </div>
+          <div class="square black">
+            <div class="pawn piece" color="color">
+              <img src="Black-Pawn.png" alt="Pawn" />
+            </div>
+          </div>
+          <div class="square white">
+            <div class="pawn piece" color="color">
+              <img src="Black-Pawn.png" alt="Pawn" />
+            </div>
+          </div>
+          <div class="square black">
+            <div class="pawn piece" color="color">
+              <img src="Black-Pawn.png" alt="Pawn" />
+            </div>
+          </div>
+          <div class="square white">
+            <div class="coordinate rank blackText">7</div>
+            <div class="pawn piece" color="color">
+              <img src="Black-Pawn.png" alt="Pawn" />
+            </div>
+          </div>
+          <! -- 6th Rank -->
+          <div class="square white"></div>
+          <div class="square black"></div>
+          <div class="square white"></div>
+          <div class="square black"></div>
+          <div class="square white"></div>
+          <div class="square black"></div>
+          <div class="square white"></div>
+          <div class="square black">
+            <div class="coordinate rank whiteText">6</div>
+          </div>
+          <! -- 5th Rank -->
+          <div class="square black"></div>
+          <div class="square white"></div>
+          <div class="square black"></div>
+          <div class="square white">
+            <div class="piece knight" id="black-knight-b8" color="color">
+              <img src="Black-Knight.png" alt="Knight" />
+            </div>
+          </div>
+          <div class="square black"></div>
+          <div class="square white"></div>
+          <div class="square black"></div>
+          <div class="square white">
+            <div class="coordinate rank blackText">5</div>
+          </div>
+  
+          <! -- 4th Rank -->
+          <div class="square white"></div>
+          <div class="square black"></div>
+          <div class="square white"></div>
+          <div class="square black"></div>
+          <div class="square white"></div>
+          <div class="square black"></div>
+          <div class="square white"></div>
+          <div class="square black">
+            <div class="coordinate rank whiteText">4</div>
+          </div>
+          <! -- 3th Rank -->
+          <div class="square black"></div>
+          <div class="square white"></div>
+          <div class="square black"></div>
+          <div class="square white"></div>
+          <div class="square black"></div>
+          <div class="square white"></div>
+          <div class="square black"></div>
+          <div class="square white">
+            <div class="coordinate rank blackText">3</div>
+          </div>
+  
+          <! -- 2th Rank -->
+          <div class="square white">
+            <div class="pawn piece" color="color">
+              <img src="White-Pawn.png" alt="Pawn" />
+            </div>
+          </div>
+          <div class="square black">
+            <div class="pawn piece" color="color">
+              <img src="White-Pawn.png" alt="Pawn" />
+            </div>
+          </div>
+          <div class="square white">
+            <div class="pawn piece" color="color">
+              <img src="White-Pawn.png" alt="Pawn" />
+            </div>
+          </div>
+          <div class="square black">
+            <div class="pawn piece" color="color">
+              <img src="White-Pawn.png" alt="Pawn" />
+            </div>
+          </div>
+          <div class="square white">
+            <div class="pawn piece" color="color">
+              <img src="White-Pawn.png" alt="Pawn" />
+            </div>
+          </div>
+          <div class="square black">
+            <div class="pawn piece" color="color">
+              <img src="White-Pawn.png" alt="Pawn" />
+            </div>
+          </div>
+          <div class="square white">
+            <div class="pawn piece" color="color">
+              <img src="White-Pawn.png" alt="Pawn" />
+            </div>
+          </div>
+          <div class="square black">
+            <div class="coordinate rank whiteText">2</div>
+            <div class="pawn piece" color="color">
+              <img src="White-Pawn.png" alt="Pawn" />
+            </div>
+          </div>
+          <! -- 1th Rank -->
+          <div class="square black">
+            <div class="coordinate whiteText">a</div>
+            <div class="rook piece" color="color">
+              <img src="White-Rook.png" alt="Rook" />
+            </div>
+          </div>
+          <div class="square white">
+            <div class="coordinate blackText">b</div>
+            <div class="piece knight" color="color">
+              <img src="White-Knight.png" alt="Knight" />
+            </div>
+          </div>
+          <div class="square black">
+            <div class="coordinate whiteText">c</div>
+            <div class="piece bishop" color="color">
+              <img src="White-Bishop.png" alt="Bishop" />
+            </div>
+          </div>
+          <div class="square white">
+            <div class="coordinate blackText">d</div>
+            <div class="piece queen" color="color">
+              <img src="White-Queen.png" alt="Queen" />
+            </div>
+          </div>
+          <div class="square black">
+            <div class="coordinate whiteText">e</div>
+            <div class="piece king" color="color">
+              <img src="White-King.png" alt="King" />
+            </div>
+          </div>
+          <div class="square white">
+            <div class="coordinate blackText">f</div>
+            <div class="piece bishop" color="color">
+              <img src="White-Bishop.png" alt="Bishop" />
+            </div>
+          </div>
+          <div class="square black">
+            <div class="coordinate whiteText">g</div>
+            <div class="piece knight" color="color">
+              <img src="White-Knight.png" alt="Knight" />
+            </div>
+          </div>
+          <div class="square white">
+            <div class="coordinate rank blackText">1</div>
+            <div class="coordinate blackText">h</div>
+            <div class="rook piece" color="color">
+              <img src="White-Rook.png" alt="Rook" />
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+   
+
+    <!-- Footer  -->
+
+    <section class="footer">
+      <h4>Бидний тухай</h4>
+      <p>
+        Эх орны хөгжлийн гарцыг тодорхойлох хүн байгальд ээлтэй шинжлэх ухаан,
+        технологийн мэдлэг, инновацийг бүтээх авьяас чадварын төвлөрөл байна.
+      </p>
+      <div class="icons">
+        <i class="fa fa-facebook"></i>
+        <i class="fa fa-twitter"></i>
+        <i class="fa fa-instagram"></i>
+        <i class="fa fa-linkedin"></i>
+      </div>
+      <p>
+        Ё. Баярсайхан Software ХХК™, Улаанбаатар хот, Монгол улсад
+        <i class="fa fa-heart-o"></i> бүтээв®, ©2025
+      </p>
+    </section>
+
+    <script>
+      var navLinks = document.getElementById("navLinks");
+
+      function showMenu() {
+        navLinks.style.right = "0";
+      }
+      function hideMenu() {
+        navLinks.style.right = "-200px";
+      }
+    </script>
+
+    <script src="main.js"></script>
+
+    <script type="model" src="app.js"></script>
+  </body>
+</html>
