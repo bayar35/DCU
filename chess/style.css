@@ -1,9 +1,4 @@
-body {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-}
+
 .chessBoard {
     width: 80vh;
     height: 80vh;
@@ -561,3 +556,4 @@ h3 {
     box-sizing: border-box;
 
 }
+
