@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Educ</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="hsk1.css" />
+    <link rel="stylesheet" href="hsk1.js" />
+
+    <title>Автоматаар нүүдэлтэй шатрын самбар</title>
+    <style>
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        /* display: flex; */
+        gap: 24px;
+        /* padding: 20px; */
+      }
+      .board {
+        display: grid;
+        grid-template-columns: repeat(8, 60px);
+        grid-template-rows: repeat(8, 60px);
+        border: 4px solid #333;
+        width: 487px;
+        margin-top: 30px;
+      }
+      .square {
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        user-select: none;
+      }
+      .light {
+        background: #f0d9b5;
+      }
+      .dark {
+        background: #b58863;
+      }
+      .controls {
+        max-width: 420px;
+      }
+      textarea {
+        width: 100%;
+        height: 140px;
+        font-family: monospace;
+        margin-bottom: 8px;
+      }
+      button {
+        padding: 8px 12px;
+        margin-right: 8px;
+      }
+      .info {
+        margin-top: 8px;
+      }
+      .move-highlight {
+        margin-top: 8px;
+        font-family: monospace;
+      }
+      .out {
+        width: 80%;
+        margin: auto;
+        display: flex;
+        gap: 50px;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="sub-header">
+      <nav>
+        <a href="index.html"><img src="images/logo.png" alt="" /></a>
+        <div class="nav-links" id="navLinks">
+          <i class="fa fa-times" onclick="hideMenu()"></i>
+          <ul>
+            <li><a href="index.html">Нүүр</a></li>
+            <li><a href="about.html">Бидний тухай</a></li>
+            <li><a href="course.html">Мэргэжил</a></li>
+            <li><a href="blog.html">Блог</a></li>
+            <li><a href="chess.html">Шатар</a></li>
+            <li><a href="solve.html">Шатрын бодлого</a></li>
+            <li><a href="review.html">Шатрын нүүдэл</a></li>
+            <li><a href="hsk1-quiz.html">HSK-1 тэст</a></li>
+            <li><a href="contact.html">Холбоо</a></li>
+          </ul>
+        </div>
+        <i class="fa fa-bars" onclick="showMenu()"></i>
+      </nav>
+      <h1>Шатрын бодлого</h1>
+    </section>
+
+    <div class="out">
+      <div>
+        <div id="board" class="board"></div>
+      </div>
+      <div class="controls">
+        <h3>Автомат нүүдэлтэй самбар</h3>
+        <p>
+          Нүүдлүүдийг дараах форматтай оруулна (нэг мөрт эсвэл олон мөрт):<br />
+          <code>e2-e4; e7-e5; Ng1-f3; Nb8-c6</code><br />
+          Мөн кирилл 'М' (М) тэмдэгтийг морь (N) гэж ойлгоно.
+        </p>
+        <textarea id="movesInput">
+    e2-e4; e7-e5; g1-f3; b8-c6; f1-c4; g8-f6</textarea
+        >
+        <div>
+          <button id="loadBtn">Ачааллах</button>
+          <button id="playBtn">Тоглуулах</button>
+          <button id="pauseBtn">Зогсоох</button>
+          <button id="stepBtn">1 нүүдэл</button>
+          <button id="resetBtn">Эхлэх байрлал</button>
+        </div>
+        <div class="info">
+          <label
+            >Интервал (сек):
+            <input
+              id="intervalSec"
+              type="number"
+              value="2"
+              min="0.2"
+              step="0.2"
+              style="width: 60px"
+          /></label>
+        </div>
+        <div class="move-highlight" id="currentMove">Одоогийн нүүдэл: -</div>
+        <div style="margin-top: 12px; font-size: 13px; color: #555">
+          Хялбар парсер: энэ жишээнд "from-to" (e2-e4) форматын нүүдлүүдийг
+          өөрөө мөрдөнө. SAN/күрвил нүүдлүүдийг (eg. "O-O") бүрэн дэмжихгүй.
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Unicode шатрын тэмдэгүүд
+      const PIECES = {
+        P: "♙",
+        N: "♘",
+        B: "♗",
+        R: "♖",
+        Q: "♕",
+        K: "♔",
+        p: "♟",
+        n: "♞",
+        b: "♝",
+        r: "♜",
+        q: "♛",
+        k: "♚",
+      };
+
+      // Анхны байрлалыг үүсгэнэ
+      function initialBoard() {
+        // 8x8 массив, rank 8 -> index 0
+        const empty = Array.from({ length: 8 }, () => Array(8).fill(""));
+        const board = JSON.parse(JSON.stringify(empty));
+        // White pieces (lower ranks)
+        const blackBack = ["r", "n", "b", "q", "k", "b", "n", "r"];
+        const whiteBack = ["R", "N", "B", "Q", "K", "B", "N", "R"];
+        board[7] = whiteBack.map((c) => c.toLowerCase()); // rank1
+        board[6] = Array(8).fill("p"); // rank2
+        board[1] = Array(8).fill("P"); // rank7 (black pawns displayed as uppercase)
+        board[0] = blackBack; // rank8
+        // Note: we'll treat lowercase as white, uppercase as black for display mapping
+        return board;
+      }
+
+      // Эвлүүлсэн дүрс харуулах үндсэн функц
+      const boardEl = document.getElementById("board");
+      let state = {
+        board: initialBoard(),
+        intervalId: null,
+        moves: [],
+        moveIndex: 0,
+      };
+
+      function coordToIndex(sq) {
+        // sq: 'e4' -> file a-h, rank 1-8
+        if (!/^[a-h][1-8]$/i.test(sq)) return null;
+        const file = sq[0].toLowerCase().charCodeAt(0) - "a".charCodeAt(0);
+        const rank = 8 - parseInt(sq[1], 10);
+        return { r: rank, c: file };
+      }
+
+      function renderBoard() {
+        boardEl.innerHTML = "";
+        for (let r = 0; r < 8; r++) {
+          for (let c = 0; c < 8; c++) {
+            const sq = document.createElement("div");
+            sq.className = "square " + ((r + c) % 2 === 0 ? "light" : "dark");
+            sq.dataset.r = r;
+            sq.dataset.c = c;
+            const piece = state.board[r][c];
+            if (piece) {
+              // piece might be lowercase white or uppercase black
+              const symbol = PIECES[piece] || PIECES[piece.toLowerCase()];
+              sq.textContent = symbol || "?";
+            }
+            boardEl.appendChild(sq);
+          }
+        }
+      }
+
+      // Move parser: оруулсан мөрөөс from-to жишээг салгаж авна
+      function parseMoves(text) {
+        // e.g. "1. e2-e4; e7-e5; Ng1-f3" etc. We'll extract patterns like (optional piece)from[-x]to
+        const tokens = text
+          .replace(/\r/g, "")
+          .split(/[;,\n]+/)
+          .map((t) => t.trim())
+          .filter(Boolean);
+        const moves = [];
+        const re = /([PNBRQKМMNnbrqk]?)([a-h][1-8])[-x]?([a-h][1-8])/i;
+        for (const t of tokens) {
+          // remove move numbers like '1.'
+          const cleaned = t.replace(/^\d+\.?\s*/, "");
+          const m = cleaned.match(re);
+          if (m) {
+            let piece = m[1] || "";
+            piece = piece.replace(/М/gi, "N"); // кирилл М -> N
+            moves.push({
+              raw: cleaned,
+              from: m[2].toLowerCase(),
+              to: m[3].toLowerCase(),
+              piece,
+            });
+          }
+        }
+        return moves;
+      }
+
+      function applyMove(move) {
+        const fromIdx = coordToIndex(move.from);
+        const toIdx = coordToIndex(move.to);
+        if (!fromIdx || !toIdx) return false;
+        const piece = state.board[fromIdx.r][fromIdx.c];
+        // If from square empty, we can't move - return false
+        if (!piece) {
+          console.warn("From-square is empty:", move.from, move);
+          return false;
+        }
+        // move piece (simple, no validation)
+        state.board[toIdx.r][toIdx.c] = piece;
+        state.board[fromIdx.r][fromIdx.c] = "";
+        return true;
+      }
+
+      function updateCurrentMoveDisplay() {
+        const el = document.getElementById("currentMove");
+        if (state.moveIndex <= 0) el.textContent = "Одоогийн нүүдэл: -";
+        else {
+          const m = state.moves[state.moveIndex - 1];
+          el.textContent = `Одоогийн нүүдэл (${state.moveIndex}/${state.moves.length}): ${m.raw} (${m.from} → ${m.to})`;
+        }
+      }
+
+      function stepForward() {
+        if (state.moveIndex >= state.moves.length) return stopAuto();
+        const move = state.moves[state.moveIndex];
+        const ok = applyMove(move);
+        state.moveIndex++;
+        renderBoard();
+        updateCurrentMoveDisplay();
+        return ok;
+      }
+
+      function resetBoard() {
+        state.board = initialBoard();
+        state.moveIndex = 0;
+        renderBoard();
+        updateCurrentMoveDisplay();
+      }
+
+      function startAuto() {
+        const sec = Math.max(
+          0.2,
+          parseFloat(document.getElementById("intervalSec").value) || 2
+        );
+        stopAuto();
+        state.intervalId = setInterval(() => {
+          if (state.moveIndex >= state.moves.length) {
+            stopAuto();
+            return;
+          }
+          stepForward();
+        }, sec * 1000);
+      }
+      function stopAuto() {
+        if (state.intervalId) {
+          clearInterval(state.intervalId);
+          state.intervalId = null;
+        }
+      }
+
+      // Controls hookup
+      document.getElementById("loadBtn").addEventListener("click", () => {
+        const text = document.getElementById("movesInput").value;
+        state.moves = parseMoves(text);
+        state.moveIndex = 0;
+        resetBoard();
+        alert(`Номхонож авсан нүүдэл: ${state.moves.length}`);
+      });
+
+      document.getElementById("playBtn").addEventListener("click", () => {
+        if (state.moves.length === 0) {
+          alert("Эхлээд нүүдлүүдийг ачааллаарай.");
+          return;
+        }
+        startAuto();
+      });
+
+      document.getElementById("pauseBtn").addEventListener("click", () => {
+        stopAuto();
+      });
+
+      document.getElementById("stepBtn").addEventListener("click", () => {
+        stopAuto();
+        stepForward();
+      });
+
+      document.getElementById("resetBtn").addEventListener("click", () => {
+        stopAuto();
+        resetBoard();
+      });
+
+      // Initialize
+      renderBoard();
+    </script>
+
+    <section class="footer">
+      <h4>Бидний тухай</h4>
+      <p>
+        Эх орны хөгжлийн гарцыг тодорхойлох хүн байгальд ээлтэй шинжлэх ухаан,
+        технологийн мэдлэг, инновацийг бүтээх авьяас чадварын төвлөрөл байна.
+      </p>
+      <div class="icons">
+        <i class="fa fa-facebook"></i>
+        <i class="fa fa-twitter"></i>
+        <i class="fa fa-instagram"></i>
+        <i class="fa fa-linkedin"></i>
+      </div>
+      <p>
+        Ё. Баярсайхан Software ХХК™, Улаанбаатар хот, Монгол улсад
+        <i class="fa fa-heart-o"></i> бүтээв®, ©2025
+      </p>
+    </section>
+
+    <script>
+      var navLinks = document.getElementById("navLinks");
+
+      function showMenu() {
+        navLinks.style.right = "0";
+      }
+
+      function hideMenu() {
+        navLinks.style.right = "-200px";
+      }
+    </script>
+
+    <!-- <div id="container3D"></div>
+    <script type="module" src="app.js"></script> -->
+  </body>
+</html>

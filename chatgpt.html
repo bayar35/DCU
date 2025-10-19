@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="mn">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Simple 3D Chess with Promotion</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body {
+        margin: 0;
+        background: #efefef;
+        font-family: system-ui, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      #container {
+        display: flex;
+        width: 100%;
+        max-width: 1200px;
+        margin-top: 10px;
+        justify-content: center;
+        gap: 10px;
+      }
+      #leftLog,
+      #rightLog {
+        width: 140px;
+        min-height: 512px;
+        background: #fff;
+        border: 2px solid #333;
+        padding: 6px;
+        box-sizing: border-box;
+        overflow: auto;
+        font-size: 14px;
+      }
+      #statusBar {
+        margin-top: 10px;
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      button {
+        padding: 6px 12px;
+        border-radius: 6px;
+        border: 1px solid #888;
+        background: #fff;
+        cursor: pointer;
+      }
+      #scoreboard {
+        display: flex;
+        gap: 20px;
+        font-weight: 700;
+        font-size: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="statusBar">
+      <div id="status">⚪ Цагаан тоглогчийн ээлж</div>
+      <div id="scoreboard">
+        ⚪: <span id="whiteScore">0</span> | ⚫: <span id="blackScore">0</span>
+      </div>
+      <div id="timers">
+        ⚪ <span id="whiteTime">05:00</span> | ⚫
+        <span id="blackTime">05:00</span>
+      </div>
+      <button id="newGame">♻️ Шинэ тоглоом</button>
+    </div>
+
+    <div id="container">
+      <div id="leftLog"><b>⚫ Хар нүүдэл</b></div>
+      <div id="board3D" style="width: 600px; height: 600px"></div>
+      <div id="rightLog"><b>⚪ Цагаан нүүдэл</b></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/three@0.154.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.154.0/examples/js/controls/OrbitControls.js"></script>
+    <script>
+      let scene, camera, renderer, controls;
+      let squares = [],
+        pieces = [];
+      const WIDTH = 8,
+        HEIGHT = 8;
+      let turn = "white",
+        selectedPiece = null;
+      let whiteScore = 0,
+        blackScore = 0,
+        whiteTime = 300,
+        blackTime = 300,
+        timerInterval = null;
+
+      // ----- Initialize scene -----
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
+      camera.position.set(4, 12, 12);
+      camera.lookAt(4, 0, 4);
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(600, 600);
+      document.getElementById("board3D").appendChild(renderer.domElement);
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enablePan = false;
+      controls.target.set(4, 0, 4);
+      controls.update();
+
+      // ----- Lights -----
+      scene.add(new THREE.DirectionalLight(0xffffff, 1).position.set(5, 10, 5));
+      scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+
+      // ----- Board -----
+      const boardGroup = new THREE.Group();
+      for (let x = 0; x < WIDTH; x++) {
+        for (let z = 0; z < HEIGHT; z++) {
+          const geo = new THREE.BoxGeometry(1, 0.1, 1);
+          const mat = new THREE.MeshPhongMaterial({
+            color: (x + z) % 2 === 0 ? 0xf0d9b5 : 0xb58863,
+          });
+          const sq = new THREE.Mesh(geo, mat);
+          sq.position.set(x, 0, z);
+          boardGroup.add(sq);
+          squares.push({ mesh: sq, x: x, z: z, piece: null });
+        }
+      }
+      scene.add(boardGroup);
+
+      // ----- Piece creation -----
+      function createPiece(color, type, x, z) {
+        let geo;
+        switch (type) {
+          case "pawn":
+            geo = new THREE.CylinderGeometry(0.3, 0.3, 0.6, 32);
+            break;
+          case "rook":
+            geo = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+            break;
+          case "knight":
+            geo = new THREE.ConeGeometry(0.35, 0.6, 32);
+            break;
+          case "bishop":
+            geo = new THREE.SphereGeometry(0.35, 32, 32);
+            break;
+          case "queen":
+            geo = new THREE.CylinderGeometry(0.35, 0.45, 0.8, 32);
+            break;
+          case "king":
+            geo = new THREE.CylinderGeometry(0.4, 0.45, 0.9, 32);
+            break;
+        }
+        const mat = new THREE.MeshPhongMaterial({
+          color: color === "white" ? 0xffffff : 0x000000,
+        });
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.position.set(x, 0.4, z);
+        mesh.userData = {
+          color: color,
+          type: type,
+          x: x,
+          z: z,
+          hasMoved: false,
+        };
+        scene.add(mesh);
+        pieces.push(mesh);
+        const sq = getSquare(x, z);
+        if (sq) sq.piece = mesh;
+        return mesh;
+      }
+      function getSquare(x, z) {
+        return squares.find((s) => s.x === x && s.z === z);
+      }
+
+      // ----- Initial placement -----
+      const whitePositions = [
+        { type: "rook", x: 0, z: 0 },
+        { type: "knight", x: 1, z: 0 },
+        { type: "bishop", x: 2, z: 0 },
+        { type: "queen", x: 3, z: 0 },
+        { type: "king", x: 4, z: 0 },
+        { type: "bishop", x: 5, z: 0 },
+        { type: "knight", x: 6, z: 0 },
+        { type: "rook", x: 7, z: 0 },
+      ];
+      for (let i = 0; i < 8; i++)
+        createPiece(
+          "white",
+          whitePositions[i].type,
+          whitePositions[i].x,
+          whitePositions[i].z
+        );
+      for (let i = 0; i < 8; i++) createPiece("white", "pawn", i, 1);
+
+      const blackPositions = [
+        { type: "rook", x: 0, z: 7 },
+        { type: "knight", x: 1, z: 7 },
+        { type: "bishop", x: 2, z: 7 },
+        { type: "queen", x: 3, z: 7 },
+        { type: "king", x: 4, z: 7 },
+        { type: "bishop", x: 5, z: 7 },
+        { type: "knight", x: 6, z: 7 },
+        { type: "rook", x: 7, z: 7 },
+      ];
+      for (let i = 0; i < 8; i++)
+        createPiece(
+          "black",
+          blackPositions[i].type,
+          blackPositions[i].x,
+          blackPositions[i].z
+        );
+      for (let i = 0; i < 8; i++) createPiece("black", "pawn", i, 6);
+
+      // ----- Move logic -----
+      function selectPiece(piece) {
+        if (piece.userData.color !== turn) return;
+        selectedPiece = piece;
+      }
+
+      function promotePawn(piece) {
+        const choice = prompt(
+          "Pawn Promotion! Сонго: queen, rook, bishop, knight",
+          "queen"
+        );
+        if (!choice) return "queen";
+        const type = choice.toLowerCase();
+        if (["queen", "rook", "bishop", "knight"].includes(type)) return type;
+        return "queen";
+      }
+
+      function movePiece(piece, targetX, targetZ) {
+        const targetSq = getSquare(targetX, targetZ);
+        if (!targetSq) return;
+        if (
+          targetSq.piece &&
+          targetSq.piece.userData.color !== piece.userData.color
+        ) {
+          scene.remove(targetSq.piece);
+          pieces.splice(pieces.indexOf(targetSq.piece), 1);
+          if (targetSq.piece.userData.color === "white") {
+            blackScore++;
+          } else {
+            whiteScore++;
+          }
+          updateScores();
+          if (targetSq.piece.userData.type === "king") {
+            endGame(piece.userData.color);
+            return;
+          }
+        }
+
+        // Castling
+        if (
+          piece.userData.type === "king" &&
+          !piece.userData.hasMoved &&
+          Math.abs(targetX - piece.userData.x) === 2
+        ) {
+          const rookX = targetX > piece.userData.x ? 7 : 0;
+          const rookSq = getSquare(rookX, piece.userData.z);
+          if (rookSq && rookSq.piece && rookSq.piece.userData.type === "rook") {
+            const newRookX =
+              rookX > piece.userData.x ? targetX - 1 : targetX + 1;
+            rookSq.piece.position.set(newRookX, 0.4, rookSq.piece.userData.z);
+            rookSq.piece.userData.x = newRookX;
+            getSquare(rookX, piece.userData.z).piece = null;
+            getSquare(newRookX, piece.userData.z).piece = rookSq.piece;
+            rookSq.piece.userData.hasMoved = true;
+          }
+        }
+
+        const origSq = getSquare(piece.userData.x, piece.userData.z);
+        if (origSq) origSq.piece = null;
+        piece.position.set(targetX, 0.4, targetZ);
+        piece.userData.x = targetX;
+        piece.userData.z = targetZ;
+        piece.userData.hasMoved = true;
+        targetSq.piece = piece;
+
+        // Pawn promotion interactive
+        if (
+          piece.userData.type === "pawn" &&
+          (targetZ === 7 || targetZ === 0)
+        ) {
+          const newType = promotePawn(piece);
+          piece.userData.type = newType;
+          let geo;
+          switch (newType) {
+            case "queen":
+              geo = new THREE.CylinderGeometry(0.35, 0.45, 0.8, 32);
+              break;
+            case "rook":
+              geo = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+              break;
+            case "bishop":
+              geo = new THREE.SphereGeometry(0.35, 32, 32);
+              break;
+            case "knight":
+              geo = new THREE.ConeGeometry(0.35, 0.6, 32);
+              break;
+          }
+          piece.geometry.dispose();
+          piece.geometry = geo;
+        }
+
+        addMoveLog(
+          piece.userData.color,
+          piece.userData.type,
+          origSq.x,
+          origSq.z,
+          targetX,
+          targetZ
+        );
+        turn = turn === "white" ? "black" : "white";
+      }
+
+      function addMoveLog(color, type, fromX, fromZ, toX, toZ) {
+        const log = document.createElement("div");
+        log.textContent = `${type} ${fromX},${fromZ}→${toX},${toZ}`;
+        if (color === "white")
+          document.getElementById("rightLog").appendChild(log);
+        else document.getElementById("leftLog").appendChild(log);
+      }
+      function updateScores() {
+        document.getElementById("whiteScore").textContent = whiteScore;
+        document.getElementById("blackScore").textContent = blackScore;
+      }
+      function endGame(winner) {
+        alert(`🎯 ${winner === "white" ? "Цагаан" : "Хар"} яллаа!`);
+        clearInterval(timerInterval);
+      }
+
+      // ----- Timer -----
+      function updateTimers() {
+        if (turn === "white") {
+          whiteTime--;
+          if (whiteTime <= 0) endGame("black");
+        } else {
+          blackTime--;
+          if (blackTime <= 0) endGame("white");
+        }
+        document.getElementById("whiteTime").textContent =
+          formatTime(whiteTime);
+        document.getElementById("blackTime").textContent =
+          formatTime(blackTime);
+      }
+      function formatTime(s) {
+        const m = Math.floor(s / 60);
+        const sec = s % 60;
+        return `${m}:${String(sec).padStart(2, "0")}`;
+      }
+      timerInterval = setInterval(updateTimers, 1000);
+
+      // ----- Animation loop -----
+      function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      // ----- Controls -----
+      renderer.domElement.addEventListener("click", onClick);
+      function onClick(event) {
+        const mouse = new THREE.Vector2();
+        const rect = renderer.domElement.getBoundingClientRect();
+        mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(
+          pieces.concat(squares.map((s) => s.mesh))
+        );
+        if (intersects.length > 0) {
+          const obj = intersects[0].object;
+          if (pieces.includes(obj)) {
+            selectPiece(obj);
+          } else if (selectedPiece) {
+            const sq = squares.find((s) => s.mesh === obj);
+            if (sq) movePiece(selectedPiece, sq.x, sq.z);
+            selectedPiece = null;
+          }
+        }
+      }
+
+      // ----- New Game -----
+      document
+        .getElementById("newGame")
+        .addEventListener("click", () => location.reload());
+    </script>
+  </body>
+</html>
