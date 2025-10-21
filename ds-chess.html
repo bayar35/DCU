@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="mn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Хоу Хараар Шатар</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="hsk1.css" />
+    <link rel="stylesheet" href="hsk1.js" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+        color: #fff;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 900px;
+        width: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        color: #fdbb2d;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
+
+      .subtitle {
+        font-size: 1.2rem;
+        color: #ccc;
+      }
+
+      .game-info {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 15px;
+        border-radius: 10px;
+      }
+
+      .player-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .player-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+      }
+
+      .black-player .player-icon {
+        background-color: #000;
+        color: white;
+      }
+
+      .white-player .player-icon {
+        background-color: #fff;
+        color: black;
+      }
+
+      .current-player {
+        background-color: rgba(253, 187, 45, 0.3);
+        padding: 5px 10px;
+        border-radius: 5px;
+      }
+
+      .game-area {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .board {
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        grid-template-rows: repeat(8, 1fr);
+        width: 100%;
+        max-width: 600px;
+        aspect-ratio: 1/1;
+        border: 10px solid #8b4513;
+        border-radius: 5px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+      }
+
+      .cell {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+
+      .cell.light {
+        background-color: #f0d9b5;
+      }
+
+      .cell.dark {
+        background-color: #b58863;
+      }
+
+      .cell.highlight::after {
+        content: "";
+        position: absolute;
+        width: 30%;
+        height: 30%;
+        border-radius: 50%;
+        background-color: rgba(0, 255, 0, 0.5);
+      }
+
+      .cell.valid-move::after {
+        content: "";
+        position: absolute;
+        width: 25%;
+        height: 25%;
+        border-radius: 50%;
+        background-color: rgba(0, 255, 0, 0.3);
+      }
+
+      .cell.capture::after {
+        content: "";
+        position: absolute;
+        width: 90%;
+        height: 90%;
+        border-radius: 50%;
+        border: 3px solid rgba(255, 0, 0, 0.5);
+      }
+
+      .piece {
+        width: 85%;
+        height: 85%;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 2.5rem;
+        cursor: grab;
+        box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
+        transition: transform 0.2s;
+        z-index: 10;
+        user-select: none;
+      }
+
+      .piece.black {
+        background-color: #000;
+        color: white;
+      }
+
+      .piece.white {
+        background-color: #fff;
+        color: black;
+        border: 1px solid #999;
+      }
+
+      .piece.dragging {
+        opacity: 0.7;
+        transform: scale(1.1);
+      }
+
+      .controls {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+      }
+
+      button {
+        padding: 12px 25px;
+        font-size: 1rem;
+        background: linear-gradient(to bottom, #fdbb2d, #b21f1f);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-weight: bold;
+      }
+
+      button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+      }
+
+      .instructions {
+        margin-top: 30px;
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 15px;
+        border-radius: 10px;
+        line-height: 1.6;
+      }
+
+      .instructions h3 {
+        color: #fdbb2d;
+        margin-bottom: 10px;
+      }
+
+      .instructions ul {
+        padding-left: 20px;
+      }
+
+      .instructions li {
+        margin-bottom: 8px;
+      }
+
+      .status-message {
+        margin-top: 10px;
+        padding: 10px;
+        border-radius: 5px;
+        text-align: center;
+        font-weight: bold;
+      }
+
+      .check {
+        background-color: rgba(255, 0, 0, 0.3);
+        color: #ffcccc;
+      }
+
+      @media (max-width: 600px) {
+        .game-info {
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .board {
+          max-width: 100%;
+        }
+
+        .piece {
+          font-size: 2rem;
+        }
+
+        .controls {
+          flex-direction: column;
+          width: 100%;
+        }
+
+        button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <section class="header">
+      <nav>
+        <a href="index.html"><img src="images/logo.png" alt="" /></a>
+        <div class="nav-links" id="navLinks">
+          <i class="fa fa-times" onclick="hideMenu()"></i>
+          <ul>
+            <li><a href="index.html">Нүүр</a></li>
+            <li><a href="about.html">Бидний тухай</a></li>
+            <li><a href="course.html">Сургалт</a></li>
+            <li><a href="blog.html">Блог</a></li>
+            <li><a href="chess.html">Шатар</a></li>
+            <li><a href="solve.html">Шатрын бодлого</a></li>
+            <li><a href="ds-chess.html">Шатрын AI</a></li>
+            <li><a href="review.html">Шатрын нүүдэл</a></li>
+            <li><a href="hsk1-quiz.html">HSK-1 тэст</a></li>
+            <li><a href="contact.html">Холбоо</a></li>
+          </ul>
+        </div>
+        <i class="fa fa-bars" onclick="showMenu()"></i>
+      </nav>
+
+      <div class="text-box">
+        <h1>Дэлхийн Хамгийн Том <br />Их Сургууль</h1>
+        <p>
+          Эх орны хөгжлийн гарцыг тодорхойлох хүн байгальд ээлтэй шинжлэх ухаан,
+          технологийн мэдлэг, инновацийг бүтээх <br />авьяас чадварын төвлөрөл
+          байна.
+        </p>
+        <a href="course.html" class="hero-btn">Дэлгэрэнгүй мэдээлэл</a>
+      </div>
+    </section>
+
+    <div class="container">
+      <header>
+        <h1>Хоу Хараар Шатар</h1>
+        <p class="subtitle">Хүн цагаан хэсгээр нүүдэл хийнэ</p>
+      </header>
+
+      <div class="game-info">
+        <div class="player-info black-player">
+          <div class="player-icon">Х</div>
+          <span>Хар тал (Компьютер)</span>
+        </div>
+
+        <div class="player-info white-player">
+          <div class="player-icon">Ц</div>
+          <span>Цагаан тал (Хүн)</span>
+        </div>
+
+        <div class="current-player">
+          Одоогийн нүүх ээлж: <span id="current-player">Цагаан</span>
+        </div>
+      </div>
+
+      <div id="status-message" class="status-message"></div>
+
+      <div class="game-area">
+        <div class="board" id="board">
+          <!-- Шатрын самбар үүсгэх -->
+        </div>
+
+        <div class="controls">
+          <button id="new-game">Шинэ тоглоом</button>
+          <button id="hint">Зөвлөгөө харуулах</button>
+          <button id="undo">Буцаах</button>
+        </div>
+      </div>
+
+      <div class="instructions">
+        <h3>Тоглоомын заавар:</h3>
+        <ul>
+          <li>Хар талыг компьютер, цагаан талыг хүн тоглоно</li>
+          <li>Цагаан хэсгээ чирж зөвшөөрөгдсөн нүд рүү шилжүүлнэ</li>
+          <li>Өөрийн ээлжийн үед л нүүдэл хийх боломжтой</li>
+          <li>Хүү (♙) диагональ чиглэлд иднэ</li>
+          <li>Ноён (♔) сэлгээ хийх боломжтой</li>
+          <li>Ноёныг шалаад идвэл хожигдоно</li>
+        </ul>
+      </div>
+    </div>
+
+    <script>
+      // Шатрын хэсгүүдийн Unicode тэмдэгтүүд
+      const PIECES = {
+        white: {
+          king: "♔",
+          queen: "♕",
+          rook: "♖",
+          bishop: "♗",
+          knight: "♘",
+          pawn: "♙",
+        },
+        black: {
+          king: "♚",
+          queen: "♛",
+          rook: "♜",
+          bishop: "♝",
+          knight: "♞",
+          pawn: "♟",
+        },
+      };
+
+      // Тоглоомын төлөв
+      const gameState = {
+        board: [],
+        currentPlayer: "white",
+        gameOver: false,
+        validMoves: [],
+        moveHistory: [],
+        whiteKingMoved: false,
+        blackKingMoved: false,
+        whiteRooksMoved: { left: false, right: false },
+        blackRooksMoved: { left: false, right: false },
+        enPassantTarget: null,
+        check: false,
+      };
+
+      // DOM элементүүд
+      const boardElement = document.getElementById("board");
+      const currentPlayerElement = document.getElementById("current-player");
+      const statusMessageElement = document.getElementById("status-message");
+      const newGameButton = document.getElementById("new-game");
+      const hintButton = document.getElementById("hint");
+      const undoButton = document.getElementById("undo");
+
+      // Тоглоомын самбарыг эхлүүлэх
+      function initializeBoard() {
+        boardElement.innerHTML = "";
+        gameState.board = [
+          [
+            { type: "rook", color: "black" },
+            { type: "knight", color: "black" },
+            { type: "bishop", color: "black" },
+            { type: "queen", color: "black" },
+            { type: "king", color: "black" },
+            { type: "bishop", color: "black" },
+            { type: "knight", color: "black" },
+            { type: "rook", color: "black" },
+          ],
+          [
+            { type: "pawn", color: "black" },
+            { type: "pawn", color: "black" },
+            { type: "pawn", color: "black" },
+            { type: "pawn", color: "black" },
+            { type: "pawn", color: "black" },
+            { type: "pawn", color: "black" },
+            { type: "pawn", color: "black" },
+            { type: "pawn", color: "black" },
+          ],
+          [null, null, null, null, null, null, null, null],
+          [null, null, null, null, null, null, null, null],
+          [null, null, null, null, null, null, null, null],
+          [null, null, null, null, null, null, null, null],
+          [
+            { type: "pawn", color: "white" },
+            { type: "pawn", color: "white" },
+            { type: "pawn", color: "white" },
+            { type: "pawn", color: "white" },
+            { type: "pawn", color: "white" },
+            { type: "pawn", color: "white" },
+            { type: "pawn", color: "white" },
+            { type: "pawn", color: "white" },
+          ],
+          [
+            { type: "rook", color: "white" },
+            { type: "knight", color: "white" },
+            { type: "bishop", color: "white" },
+            { type: "queen", color: "white" },
+            { type: "king", color: "white" },
+            { type: "bishop", color: "white" },
+            { type: "knight", color: "white" },
+            { type: "rook", color: "white" },
+          ],
+        ];
+
+        // Тоглоомын төлөвүүдийг дахин эхлүүлэх
+        gameState.currentPlayer = "white";
+        gameState.gameOver = false;
+        gameState.moveHistory = [];
+        gameState.whiteKingMoved = false;
+        gameState.blackKingMoved = false;
+        gameState.whiteRooksMoved = { left: false, right: false };
+        gameState.blackRooksMoved = { left: false, right: false };
+        gameState.enPassantTarget = null;
+        gameState.check = false;
+
+        // Самбарыг үүсгэх
+        for (let row = 0; row < 8; row++) {
+          for (let col = 0; col < 8; col++) {
+            const cell = document.createElement("div");
+            cell.className = `cell ${(row + col) % 2 === 0 ? "light" : "dark"}`;
+            cell.dataset.row = row;
+            cell.dataset.col = col;
+
+            // Хэрэглэгч хэсгийг чирэх үед
+            cell.addEventListener("dragover", handleDragOver);
+            cell.addEventListener("dragenter", handleDragEnter);
+            cell.addEventListener("dragleave", handleDragLeave);
+            cell.addEventListener("drop", handleDrop);
+
+            // Хэсэг байрлуулах
+            if (gameState.board[row][col]) {
+              const piece = createPiece(gameState.board[row][col], row, col);
+              cell.appendChild(piece);
+            }
+
+            boardElement.appendChild(cell);
+          }
+        }
+
+        updateGameState();
+      }
+
+      // Хэсэг үүсгэх
+      function createPiece(pieceData, row, col) {
+        const piece = document.createElement("div");
+        piece.className = `piece ${pieceData.color}`;
+        piece.textContent = PIECES[pieceData.color][pieceData.type];
+        piece.draggable = pieceData.color === "white"; // Зөвхөн цагаан хэсгийг чирнэ
+        piece.dataset.row = row;
+        piece.dataset.col = col;
+        piece.dataset.type = pieceData.type;
+        piece.dataset.color = pieceData.color;
+
+        piece.addEventListener("dragstart", handleDragStart);
+        piece.addEventListener("dragend", handleDragEnd);
+
+        return piece;
+      }
+
+      // Чирэх үйлдлийг эхлүүлэх
+      function handleDragStart(e) {
+        // Зөвхөн цагаан хэсгийг чирнэ
+        if (gameState.currentPlayer !== "white" || gameState.gameOver) {
+          e.preventDefault();
+          return;
+        }
+
+        const fromRow = parseInt(e.target.dataset.row);
+        const fromCol = parseInt(e.target.dataset.col);
+
+        e.dataTransfer.setData("text/plain", `${fromRow},${fromCol}`);
+        e.target.classList.add("dragging");
+
+        // Боломжит нүүдлүүдийг харуулах
+        showValidMoves(fromRow, fromCol);
+      }
+
+      // Чирэх үед зөвшөөрөх
+      function handleDragOver(e) {
+        e.preventDefault();
+      }
+
+      // Чирэх үед онцлох
+      function handleDragEnter(e) {
+        e.preventDefault();
+        const row = parseInt(e.target.dataset.row);
+        const col = parseInt(e.target.dataset.col);
+
+        // Боломжит нүүдэл мөн эсэхийг шалгах
+        if (
+          isValidMove(
+            parseInt(e.dataTransfer.getData("text/plain").split(",")[0]),
+            parseInt(e.dataTransfer.getData("text/plain").split(",")[1]),
+            row,
+            col
+          )
+        ) {
+          if (gameState.board[row][col]) {
+            e.target.classList.add("capture");
+          } else {
+            e.target.classList.add("valid-move");
+          }
+        }
+      }
+
+      // Чирэх үйлдэл дууссан
+      function handleDragLeave(e) {
+        e.target.classList.remove("valid-move", "capture");
+      }
+
+      // Хэсгийг буулгах
+      function handleDrop(e) {
+        e.preventDefault();
+        e.target.classList.remove("valid-move", "capture");
+
+        if (gameState.gameOver || gameState.currentPlayer !== "white") return;
+
+        const fromCoords = e.dataTransfer.getData("text/plain").split(",");
+        const fromRow = parseInt(fromCoords[0]);
+        const fromCol = parseInt(fromCoords[1]);
+        const toRow = parseInt(e.target.dataset.row);
+        const toCol = parseInt(e.target.dataset.col);
+
+        // Нүүдэл хийх
+        if (isValidMove(fromRow, fromCol, toRow, toCol)) {
+          makeMove(fromRow, fromCol, toRow, toCol);
+        }
+
+        // Боломжит нүүдлүүдийг нуух
+        hideValidMoves();
+      }
+
+      // Чирэх дууссан
+      function handleDragEnd(e) {
+        e.target.classList.remove("dragging");
+        hideValidMoves();
+      }
+
+      // Боломжит нүүдлүүдийг харуулах
+      function showValidMoves(fromRow, fromCol) {
+        const cells = document.querySelectorAll(".cell");
+        cells.forEach((cell) => {
+          const toRow = parseInt(cell.dataset.row);
+          const toCol = parseInt(cell.dataset.col);
+
+          if (isValidMove(fromRow, fromCol, toRow, toCol)) {
+            if (gameState.board[toRow][toCol]) {
+              cell.classList.add("capture");
+            } else {
+              cell.classList.add("valid-move");
+            }
+          }
+        });
+      }
+
+      // Боломжит нүүдлүүдийг нуух
+      function hideValidMoves() {
+        const cells = document.querySelectorAll(".cell");
+        cells.forEach((cell) => {
+          cell.classList.remove("valid-move", "capture");
+        });
+      }
+
+      // Нүүдэл хийх боломжтой эсэхийг шалгах
+      function isValidMove(fromRow, fromCol, toRow, toCol) {
+        const piece = gameState.board[fromRow][fromCol];
+        if (!piece || piece.color !== gameState.currentPlayer) return false;
+
+        // Хүрээнээс гарсан эсэхийг шалгах
+        if (toRow < 0 || toRow > 7 || toCol < 0 || toCol > 7) return false;
+
+        // Өөрийн хэсгийг идэхгүй байх
+        const targetPiece = gameState.board[toRow][toCol];
+        if (targetPiece && targetPiece.color === piece.color) return false;
+
+        // Хэсгийн төрлөөс хамаарсан нүүдлийн дүрэм
+        switch (piece.type) {
+          case "pawn":
+            return isValidPawnMove(fromRow, fromCol, toRow, toCol, piece.color);
+          case "knight":
+            return isValidKnightMove(fromRow, fromCol, toRow, toCol);
+          case "bishop":
+            return isValidBishopMove(fromRow, fromCol, toRow, toCol);
+          case "rook":
+            return isValidRookMove(fromRow, fromCol, toRow, toCol);
+          case "queen":
+            return isValidQueenMove(fromRow, fromCol, toRow, toCol);
+          case "king":
+            return isValidKingMove(fromRow, fromCol, toRow, toCol, piece.color);
+          default:
+            return false;
+        }
+      }
+
+      // Хүүгийн нүүдлийг шалгах
+      function isValidPawnMove(fromRow, fromCol, toRow, toCol, color) {
+        const direction = color === "white" ? -1 : 1;
+        const startRow = color === "white" ? 6 : 1;
+
+        // Урдуу нүүх
+        if (fromCol === toCol) {
+          // Нэг нүд нүүх
+          if (toRow === fromRow + direction && !gameState.board[toRow][toCol]) {
+            return true;
+          }
+          // Эхний нүүдэлд 2 нүд нүүх
+          if (
+            fromRow === startRow &&
+            toRow === fromRow + 2 * direction &&
+            !gameState.board[fromRow + direction][fromCol] &&
+            !gameState.board[toRow][toCol]
+          ) {
+            return true;
+          }
+        }
+
+        // Диагональ идэх
+        if (Math.abs(fromCol - toCol) === 1 && toRow === fromRow + direction) {
+          // Энгийн идэх
+          if (
+            gameState.board[toRow][toCol] &&
+            gameState.board[toRow][toCol].color !== color
+          ) {
+            return true;
+          }
+          // Бодоор идэх
+          if (
+            gameState.enPassantTarget &&
+            gameState.enPassantTarget.row === toRow - direction &&
+            gameState.enPassantTarget.col === toCol
+          ) {
+            return true;
+          }
+        }
+
+        return false;
+      }
+
+      // Морины нүүдлийг шалгах
+      function isValidKnightMove(fromRow, fromCol, toRow, toCol) {
+        const rowDiff = Math.abs(fromRow - toRow);
+        const colDiff = Math.abs(fromCol - toCol);
+        return (
+          (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2)
+        );
+      }
+
+      // Тэмээний нүүдлийг шалгах
+      function isValidBishopMove(fromRow, fromCol, toRow, toCol) {
+        if (Math.abs(fromRow - toRow) !== Math.abs(fromCol - toCol))
+          return false;
+
+        const rowStep = fromRow < toRow ? 1 : -1;
+        const colStep = fromCol < toCol ? 1 : -1;
+
+        let currentRow = fromRow + rowStep;
+        let currentCol = fromCol + colStep;
+
+        while (currentRow !== toRow && currentCol !== toCol) {
+          if (gameState.board[currentRow][currentCol]) return false;
+          currentRow += rowStep;
+          currentCol += colStep;
+        }
+
+        return true;
+      }
+
+      // Тэрэгний нүүдлийг шалгах
+      function isValidRookMove(fromRow, fromCol, toRow, toCol) {
+        if (fromRow !== toRow && fromCol !== toCol) return false;
+
+        if (fromRow === toRow) {
+          // Хэвтээ нүүдэл
+          const step = fromCol < toCol ? 1 : -1;
+          for (let col = fromCol + step; col !== toCol; col += step) {
+            if (gameState.board[fromRow][col]) return false;
+          }
+        } else {
+          // Босоо нүүдэл
+          const step = fromRow < toRow ? 1 : -1;
+          for (let row = fromRow + step; row !== toRow; row += step) {
+            if (gameState.board[row][fromCol]) return false;
+          }
+        }
+
+        return true;
+      }
+
+      // Бэрсийн нүүдлийг шалгах
+      function isValidQueenMove(fromRow, fromCol, toRow, toCol) {
+        return (
+          isValidBishopMove(fromRow, fromCol, toRow, toCol) ||
+          isValidRookMove(fromRow, fromCol, toRow, toCol)
+        );
+      }
+
+      // Ноёны нүүдлийг шалгах
+      function isValidKingMove(fromRow, fromCol, toRow, toCol, color) {
+        const rowDiff = Math.abs(fromRow - toRow);
+        const colDiff = Math.abs(fromCol - toCol);
+
+        // Энгийн нүүдэл
+        if (rowDiff <= 1 && colDiff <= 1) {
+          return true;
+        }
+
+        // Сэлгээ
+        if (rowDiff === 0 && colDiff === 2) {
+          return canCastle(fromRow, fromCol, toRow, toCol, color);
+        }
+
+        return false;
+      }
+
+      // Сэлгээ хийх боломжтой эсэхийг шалгах
+      function canCastle(fromRow, fromCol, toRow, toCol, color) {
+        if (color === "white" && gameState.whiteKingMoved) return false;
+        if (color === "black" && gameState.blackKingMoved) return false;
+
+        // Баруун сэлгээ (жижиг сэлгээ)
+        if (toCol === 6) {
+          const rook = gameState.board[fromRow][7];
+          if (!rook || rook.type !== "rook" || rook.color !== color)
+            return false;
+          if (color === "white" && gameState.whiteRooksMoved.right)
+            return false;
+          if (color === "black" && gameState.blackRooksMoved.right)
+            return false;
+
+          // Зам нээлттэй эсэхийг шалгах
+          if (gameState.board[fromRow][5] || gameState.board[fromRow][6])
+            return false;
+
+          return true;
+        }
+
+        // Зүүн сэлгээ (том сэлгээ)
+        if (toCol === 2) {
+          const rook = gameState.board[fromRow][0];
+          if (!rook || rook.type !== "rook" || rook.color !== color)
+            return false;
+          if (color === "white" && gameState.whiteRooksMoved.left) return false;
+          if (color === "black" && gameState.blackRooksMoved.left) return false;
+
+          // Зам нээлттэй эсэхийг шалгах
+          if (
+            gameState.board[fromRow][1] ||
+            gameState.board[fromRow][2] ||
+            gameState.board[fromRow][3]
+          )
+            return false;
+
+          return true;
+        }
+
+        return false;
+      }
+
+      // Нүүдэл хийх
+      function makeMove(fromRow, fromCol, toRow, toCol) {
+        const piece = gameState.board[fromRow][fromCol];
+
+        // Нүүдлийг түүхэд хадгалах
+        gameState.moveHistory.push({
+          from: { row: fromRow, col: fromCol },
+          to: { row: toRow, col: toCol },
+          captured: gameState.board[toRow][toCol],
+          piece: { ...piece },
+          enPassantTarget: gameState.enPassantTarget,
+          whiteKingMoved: gameState.whiteKingMoved,
+          blackKingMoved: gameState.blackKingMoved,
+          whiteRooksMoved: { ...gameState.whiteRooksMoved },
+          blackRooksMoved: { ...gameState.blackRooksMoved },
+        });
+
+        // Ноён сэлгээ
+        if (piece.type === "king" && Math.abs(fromCol - toCol) === 2) {
+          // Баруун сэлгээ
+          if (toCol === 6) {
+            gameState.board[fromRow][5] = gameState.board[fromRow][7];
+            gameState.board[fromRow][7] = null;
+          }
+          // Зүүн сэлгээ
+          else if (toCol === 2) {
+            gameState.board[fromRow][3] = gameState.board[fromRow][0];
+            gameState.board[fromRow][0] = null;
+          }
+        }
+
+        // Бодоор идэх
+        let capturedPiece = gameState.board[toRow][toCol];
+        if (piece.type === "pawn" && fromCol !== toCol && !capturedPiece) {
+          capturedPiece = gameState.board[fromRow][toCol];
+          gameState.board[fromRow][toCol] = null;
+        }
+
+        // Хэсгийг шилжүүлэх
+        gameState.board[toRow][toCol] = piece;
+        gameState.board[fromRow][fromCol] = null;
+
+        // Хүүгийн бодоор идэх боломжийг тохируулах
+        gameState.enPassantTarget = null;
+        if (piece.type === "pawn" && Math.abs(fromRow - toRow) === 2) {
+          gameState.enPassantTarget = {
+            row: (fromRow + toRow) / 2,
+            col: fromCol,
+          };
+        }
+
+        // Хүүгийн дэвшил
+        if (piece.type === "pawn" && (toRow === 0 || toRow === 7)) {
+          gameState.board[toRow][toCol] = { type: "queen", color: piece.color };
+        }
+
+        // Ноён, тэрэгний нүүдлийг тэмдэглэх
+        if (piece.type === "king") {
+          if (piece.color === "white") gameState.whiteKingMoved = true;
+          else gameState.blackKingMoved = true;
+        }
+
+        if (piece.type === "rook") {
+          if (piece.color === "white") {
+            if (fromCol === 0) gameState.whiteRooksMoved.left = true;
+            if (fromCol === 7) gameState.whiteRooksMoved.right = true;
+          } else {
+            if (fromCol === 0) gameState.blackRooksMoved.left = true;
+            if (fromCol === 7) gameState.blackRooksMoved.right = true;
+          }
+        }
+
+        // Ээлжийг солих
+        gameState.currentPlayer =
+          gameState.currentPlayer === "white" ? "black" : "white";
+
+        updateBoard();
+        updateGameState();
+
+        // Шал шалгах
+        gameState.check = isInCheck(gameState.currentPlayer);
+        if (gameState.check) {
+          if (isCheckmate(gameState.currentPlayer)) {
+            gameState.gameOver = true;
+            statusMessageElement.textContent = `Шал мат! ${
+              gameState.currentPlayer === "white" ? "Хар" : "Цагаан"
+            } хожлоо!`;
+            statusMessageElement.className = "status-message check";
+          } else {
+            statusMessageElement.textContent = "Шал!";
+            statusMessageElement.className = "status-message check";
+          }
+        } else {
+          statusMessageElement.textContent = "";
+          statusMessageElement.className = "status-message";
+        }
+
+        // Компьютерийн нүүдэл
+        if (!gameState.gameOver && gameState.currentPlayer === "black") {
+          setTimeout(computerMove, 1000);
+        }
+      }
+
+      // Шалд байгаа эсэхийг шалгах
+      function isInCheck(color) {
+        // Ноёны байрлалыг олох
+        let kingRow, kingCol;
+        for (let row = 0; row < 8; row++) {
+          for (let col = 0; col < 8; col++) {
+            const piece = gameState.board[row][col];
+            if (piece && piece.type === "king" && piece.color === color) {
+              kingRow = row;
+              kingCol = col;
+              break;
+            }
+          }
+        }
+
+        // Эсрэг талын хэсгүүд ноёныг идэх боломжтой эсэхийг шалгах
+        const opponentColor = color === "white" ? "black" : "white";
+        for (let row = 0; row < 8; row++) {
+          for (let col = 0; col < 8; col++) {
+            const piece = gameState.board[row][col];
+            if (piece && piece.color === opponentColor) {
+              if (isValidMove(row, col, kingRow, kingCol)) {
+                return true;
+              }
+            }
+          }
+        }
+
+        return false;
+      }
+
+      // Шал мат эсэхийг шалгах
+      function isCheckmate(color) {
+        // Аливаа нүүдэл шалыг арилгаж чадах эсэхийг шалгах
+        for (let fromRow = 0; fromRow < 8; fromRow++) {
+          for (let fromCol = 0; fromCol < 8; fromCol++) {
+            const piece = gameState.board[fromRow][fromCol];
+            if (piece && piece.color === color) {
+              for (let toRow = 0; toRow < 8; toRow++) {
+                for (let toCol = 0; toCol < 8; toCol++) {
+                  if (isValidMove(fromRow, fromCol, toRow, toCol)) {
+                    // Нүүдлийг туршиж үзэх
+                    const originalPiece = gameState.board[toRow][toCol];
+                    gameState.board[toRow][toCol] = piece;
+                    gameState.board[fromRow][fromCol] = null;
+
+                    const stillInCheck = isInCheck(color);
+
+                    // Нүүдлийг буцаах
+                    gameState.board[fromRow][fromCol] = piece;
+                    gameState.board[toRow][toCol] = originalPiece;
+
+                    if (!stillInCheck) {
+                      return false;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        return true;
+      }
+
+      // Компьютерийн нүүдэл
+      function computerMove() {
+        if (gameState.gameOver || gameState.currentPlayer !== "black") return;
+
+        // Боломжит нүүдлүүдийг олох
+        const validMoves = [];
+        for (let fromRow = 0; fromRow < 8; fromRow++) {
+          for (let fromCol = 0; fromCol < 8; fromCol++) {
+            const piece = gameState.board[fromRow][fromCol];
+            if (piece && piece.color === "black") {
+              for (let toRow = 0; toRow < 8; toRow++) {
+                for (let toCol = 0; toCol < 8; toCol++) {
+                  if (isValidMove(fromRow, fromCol, toRow, toCol)) {
+                    validMoves.push({
+                      from: { row: fromRow, col: fromCol },
+                      to: { row: toRow, col: toCol },
+                    });
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        // Нэг нүүдэл сонгох
+        if (validMoves.length > 0) {
+          const move =
+            validMoves[Math.floor(Math.random() * validMoves.length)];
+          makeMove(move.from.row, move.from.col, move.to.row, move.to.col);
+        } else {
+          // Нүүх боломжгүй бол тоглоом дуусна
+          gameState.gameOver = true;
+          if (gameState.check) {
+            statusMessageElement.textContent = "Шал мат! Цагаан хожлоо!";
+          } else {
+            statusMessageElement.textContent = "Тэнцлээ!";
+          }
+          statusMessageElement.className = "status-message";
+          updateGameState();
+        }
+      }
+
+      // Самбарыг шинэчлэх
+      function updateBoard() {
+        const cells = document.querySelectorAll(".cell");
+
+        cells.forEach((cell) => {
+          const row = parseInt(cell.dataset.row);
+          const col = parseInt(cell.dataset.col);
+
+          cell.innerHTML = "";
+
+          if (gameState.board[row][col]) {
+            const piece = createPiece(gameState.board[row][col], row, col);
+            cell.appendChild(piece);
+          }
+        });
+      }
+
+      // Тоглоомын төлөвийг шинэчлэх
+      function updateGameState() {
+        // Одоогийн тоглогчийг харуулах
+        currentPlayerElement.textContent =
+          gameState.currentPlayer === "white" ? "Цагаан" : "Хар";
+        currentPlayerElement.style.color =
+          gameState.currentPlayer === "white" ? "#fff" : "#000";
+
+        // Буцаах товчийг идэвхжүүлэх/йдэвхгүй болгох
+        undoButton.disabled = gameState.moveHistory.length === 0;
+      }
+
+      // Шинэ тоглоом эхлүүлэх
+      function newGame() {
+        initializeBoard();
+        statusMessageElement.textContent = "";
+        statusMessageElement.className = "status-message";
+      }
+
+      // Зөвлөгөө харуулах
+      function showHint() {
+        alert(
+          "Цагаан хэсгээ чирж зөвшөөрөгдсөн нүд рүү шилжүүлнэ. Ногоон дугуй нь боломжит нүүдлийг, улаан хүрээ нь идэх боломжийг харуулна."
+        );
+      }
+
+      // Нүүдэл буцаах
+      function undoMove() {
+        if (gameState.moveHistory.length === 0) return;
+
+        const lastMove = gameState.moveHistory.pop();
+
+        // Нүүдлийг буцаах
+        gameState.board[lastMove.from.row][lastMove.from.col] = lastMove.piece;
+        gameState.board[lastMove.to.row][lastMove.to.col] = lastMove.captured;
+
+        // Тоглоомын төлөвүүдийг буцаах
+        gameState.enPassantTarget = lastMove.enPassantTarget;
+        gameState.whiteKingMoved = lastMove.whiteKingMoved;
+        gameState.blackKingMoved = lastMove.blackKingMoved;
+        gameState.whiteRooksMoved = lastMove.whiteRooksMoved;
+        gameState.blackRooksMoved = lastMove.blackRooksMoved;
+
+        // Ээлжийг буцаах
+        gameState.currentPlayer =
+          gameState.currentPlayer === "white" ? "black" : "white";
+        gameState.gameOver = false;
+        gameState.check = false;
+
+        updateBoard();
+        updateGameState();
+        statusMessageElement.textContent = "";
+        statusMessageElement.className = "status-message";
+      }
+
+      // Эхлүүлэх
+      initializeBoard();
+
+      // Event listener-ууд
+      newGameButton.addEventListener("click", newGame);
+      hintButton.addEventListener("click", showHint);
+      undoButton.addEventListener("click", undoMove);
+    </script>
+
+    <section class="footer">
+      <h4>Бидний тухай</h4>
+      <p>
+        Эх орны хөгжлийн гарцыг тодорхойлох хүн байгальд ээлтэй шинжлэх ухаан,
+        технологийн мэдлэг, инновацийг бүтээх авьяас чадварын төвлөрөл байна.
+      </p>
+      <div class="icons">
+        <i class="fa fa-facebook"></i>
+        <i class="fa fa-twitter"></i>
+        <i class="fa fa-instagram"></i>
+        <i class="fa fa-linkedin"></i>
+      </div>
+      <p>
+        Ё. Баярсайхан Software ХХК™, Улаанбаатар хот, Монгол улсад
+        <i class="fa fa-heart-o"></i> бүтээв®, ©2025
+      </p>
+    </section>
+
+    <script>
+      var navLinks = document.getElementById("navLinks");
+
+      function showMenu() {
+        navLinks.style.right = "0";
+      }
+
+      function hideMenu() {
+        navLinks.style.right = "-200px";
+      }
+    </script>
+  </body>
+</html>
